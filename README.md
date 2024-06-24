@@ -13,10 +13,6 @@ This document will enable you to generate your first 30 unit tests in less than 
 ```
 npm install
 ```
-```bash
-# watch mode
-$ npm run start:dev
-```
 
 > The sample todo-app Setup is completed
 <br>
