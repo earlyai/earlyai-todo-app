@@ -2,11 +2,7 @@
 // Unit tests for: createTodoSignitureOnly
 
 import { Request, Response } from 'express';
-
-
-
 import { createTodoSignitureOnly } from './todoController';
-
 
 class MockTodoService {
   public createTodo = jest.fn();
