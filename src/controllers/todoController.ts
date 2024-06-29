@@ -33,6 +33,23 @@ export const getTodos = (todoService: TodoService) => (req: Request, res: Respon
   }
 };
 
+/*
+Geneate suffieicent Happy path unit tests
+And create  Edge cases for:
+1. Invalidate date format
+2. Missing title
+3. Service rrror
+*/
+export const createTodoSignitureOnly = (todoService: TodoService) => (req: Request, res: Response): void => {
+  try {
+    // todo: no implementation yet...
+    const newTodo = {}
+    res.status(201).json(newTodo);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 export const createTodo = (todoService: TodoService) => (req: Request, res: Response): void => {
   try {
     const { title, priority, dueDate, reminder } = req.body;
