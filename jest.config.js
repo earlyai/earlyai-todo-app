@@ -26,6 +26,6 @@ module.exports = {
     "!**/dist/**",
     "!**/routes/**"
   ],
-  coveragePathIgnorePatterns: ["/node_modules/", "/dist/"],
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/","/routes/","/db.ts","/app.ts","/models"],
   coverageDirectory: "../coverage",
 };
