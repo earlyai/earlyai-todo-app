@@ -17,14 +17,7 @@ module.exports = {
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
   collectCoverage: true,
   collectCoverageFrom: [
-    "**/*.(t|j)s", 
-    "!**/*.d.ts", 
-    "!**/node_modules/**", 
-    "!**/index.ts",
-    "!**/app.ts",
-    "!**/db.ts",
-    "!**/dist/**",
-    "!**/routes/**"
+    "**/*.(t|j)s"
   ],
   coveragePathIgnorePatterns: ["/node_modules/", "/dist/","/routes/","/db.ts","/app.ts","/models"],
   coverageDirectory: "../coverage",
