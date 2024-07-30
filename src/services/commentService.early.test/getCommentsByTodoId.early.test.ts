@@ -1,31 +1,27 @@
 
 // Unit tests for: getCommentsByTodoId
 
-import { Comment } from '../models/comment';
+import { Comment } from '../../models/comment';
 
 
-import { CommentService, IDatabase, IStatement } from './commentService';
+import { CommentService, IDatabase, IStatement } from '../commentService';
 
-
-jest.mock('uuid', () => ({
-  v4: jest.fn(),
-}));
 
 describe('CommentService.getCommentsByTodoId() getCommentsByTodoId method', () => {
-  let dbMock: IDatabase;
-  let statementMock: IStatement;
+  let dbMock: jest.Mocked<IDatabase>;
+  let statementMock: jest.Mocked<IStatement>;
   let commentService: CommentService;
 
   beforeEach(() => {
     statementMock = {
       run: jest.fn(),
       all: jest.fn(),
-      get: jest.fn(),
+      get: jest.fn()
     };
 
     dbMock = {
       prepare: jest.fn().mockReturnValue(statementMock),
-      exec: jest.fn(),
+      exec: jest.fn()
     };
 
     commentService = new CommentService(dbMock);
@@ -34,12 +30,12 @@ describe('CommentService.getCommentsByTodoId() getCommentsByTodoId method', () =
   describe('Happy Path', () => {
     it('should return comments for a given todoId', () => {
       // Arrange
-      const todoId = '123';
+      const todoId = 'todo-123';
       const comments: Comment[] = [
-        { id: '1', todoId: '123', content: 'Test comment 1', timestamp: '2023-01-01T00:00:00Z' },
-        { id: '2', todoId: '123', content: 'Test comment 2', timestamp: '2023-01-02T00:00:00Z' },
+        { id: 'comment-1', todoId, content: 'First comment', timestamp: '2023-01-01T00:00:00Z' },
+        { id: 'comment-2', todoId, content: 'Second comment', timestamp: '2023-01-02T00:00:00Z' }
       ];
-      (statementMock.all as unknown as jest.Mock).mockReturnValue(comments);
+      statementMock.all.mockReturnValue(comments);
 
       // Act
       const result = commentService.getCommentsByTodoId(todoId);
@@ -54,8 +50,8 @@ describe('CommentService.getCommentsByTodoId() getCommentsByTodoId method', () =
   describe('Edge Cases', () => {
     it('should return an empty array if no comments are found for the given todoId', () => {
       // Arrange
-      const todoId = '123';
-      (statementMock.all as unknown as jest.Mock).mockReturnValue([]);
+      const todoId = 'todo-123';
+      statementMock.all.mockReturnValue([]);
 
       // Act
       const result = commentService.getCommentsByTodoId(todoId);
@@ -68,8 +64,8 @@ describe('CommentService.getCommentsByTodoId() getCommentsByTodoId method', () =
 
     it('should handle SQL errors gracefully', () => {
       // Arrange
-      const todoId = '123';
-      (statementMock.all as unknown as jest.Mock).mockImplementation(() => {
+      const todoId = 'todo-123';
+      statementMock.all.mockImplementation(() => {
         throw new Error('SQL error');
       });
 
@@ -79,10 +75,10 @@ describe('CommentService.getCommentsByTodoId() getCommentsByTodoId method', () =
       expect(statementMock.all).toHaveBeenCalled();
     });
 
-    it('should handle invalid todoId input gracefully', () => {
+    it('should handle invalid todoId gracefully', () => {
       // Arrange
       const todoId = '';
-      (statementMock.all as unknown as jest.Mock).mockReturnValue([]);
+      statementMock.all.mockReturnValue([]);
 
       // Act
       const result = commentService.getCommentsByTodoId(todoId);

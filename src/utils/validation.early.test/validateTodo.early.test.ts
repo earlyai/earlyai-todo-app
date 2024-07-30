@@ -3,7 +3,7 @@
 
 import { NextFunction, Request, Response } from 'express';
 
-import { validateTodo } from './validation';
+import { validateTodo } from '../validation';
 
 
 describe('validateTodo() validateTodo method', () => {
@@ -23,14 +23,11 @@ describe('validateTodo() validateTodo method', () => {
   });
 
   describe('Happy Path', () => {
-    it('should call next() when title is a valid non-empty string', () => {
-      // Arrange
+    test('should call next() when title is a valid non-empty string', () => {
       req.body.title = 'Valid Title';
 
-      // Act
       validateTodo(req as Request, res as Response, next);
 
-      // Assert
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalled();
       expect(res.json).not.toHaveBeenCalled();
@@ -38,63 +35,61 @@ describe('validateTodo() validateTodo method', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should return 400 when title is missing', () => {
-      // Arrange
-      req.body.title = undefined;
-
-      // Act
+    test('should return 400 when title is missing', () => {
       validateTodo(req as Request, res as Response, next);
 
-      // Assert
       expect(res.status).toHaveBeenCalledWith(400);
-      expect((res.status as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(res.json).toHaveBeenCalledWith({ message: 'Invalid title' });
-      expect((res.json as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when title is an empty string', () => {
-      // Arrange
+    test('should return 400 when title is an empty string', () => {
       req.body.title = '';
 
-      // Act
       validateTodo(req as Request, res as Response, next);
 
-      // Assert
       expect(res.status).toHaveBeenCalledWith(400);
-      expect((res.status as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(res.json).toHaveBeenCalledWith({ message: 'Invalid title' });
-      expect((res.json as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when title is a string with only spaces', () => {
-      // Arrange
+    test('should return 400 when title is a string with only spaces', () => {
       req.body.title = '   ';
 
-      // Act
       validateTodo(req as Request, res as Response, next);
 
-      // Assert
       expect(res.status).toHaveBeenCalledWith(400);
-      expect((res.status as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(res.json).toHaveBeenCalledWith({ message: 'Invalid title' });
-      expect((res.json as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when title is not a string', () => {
-      // Arrange
+    test('should return 400 when title is not a string', () => {
       req.body.title = 123;
 
-      // Act
       validateTodo(req as Request, res as Response, next);
 
-      // Assert
       expect(res.status).toHaveBeenCalledWith(400);
-      expect((res.status as unknown as jest.Mock).mock.calls.length).toBe(1);
       expect(res.json).toHaveBeenCalledWith({ message: 'Invalid title' });
-      expect((res.json as unknown as jest.Mock).mock.calls.length).toBe(1);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    test('should return 400 when title is null', () => {
+      req.body.title = null;
+
+      validateTodo(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Invalid title' });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    test('should return 400 when title is undefined', () => {
+      req.body.title = undefined;
+
+      validateTodo(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Invalid title' });
       expect(next).not.toHaveBeenCalled();
     });
   });

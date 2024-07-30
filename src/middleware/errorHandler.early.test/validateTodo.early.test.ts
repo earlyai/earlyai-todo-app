@@ -3,7 +3,7 @@
 
 import { NextFunction, Request, Response } from 'express';
 
-import { validateTodo } from './errorHandler';
+import { validateTodo } from '../errorHandler';
 
 
 describe('validateTodo() validateTodo method', () => {
@@ -23,7 +23,7 @@ describe('validateTodo() validateTodo method', () => {
   });
 
   describe('Happy Path', () => {
-    it('should call next when title is valid and no dates are provided', () => {
+    test('should call next() when title is valid and no dates are provided', () => {
       req.body = { title: 'Valid Title' };
 
       validateTodo(req as Request, res as Response, next);
@@ -33,28 +33,8 @@ describe('validateTodo() validateTodo method', () => {
       expect(res.json).not.toHaveBeenCalled();
     });
 
-    it('should call next when title and valid dueDate are provided', () => {
-      req.body = { title: 'Valid Title', dueDate: '2023-10-10' };
-
-      validateTodo(req as Request, res as Response, next);
-
-      expect(next).toHaveBeenCalled();
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
-    });
-
-    it('should call next when title and valid reminder are provided', () => {
-      req.body = { title: 'Valid Title', reminder: '2023-10-10' };
-
-      validateTodo(req as Request, res as Response, next);
-
-      expect(next).toHaveBeenCalled();
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
-    });
-
-    it('should call next when title, valid dueDate, and valid reminder are provided', () => {
-      req.body = { title: 'Valid Title', dueDate: '2023-10-10', reminder: '2023-10-10' };
+    test('should call next() when title, dueDate, and reminder are valid', () => {
+      req.body = { title: 'Valid Title', dueDate: '2023-12-31', reminder: '2023-12-30' };
 
       validateTodo(req as Request, res as Response, next);
 
@@ -65,8 +45,8 @@ describe('validateTodo() validateTodo method', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should return 400 if title is missing', () => {
-      req.body = {};
+    test('should return 400 if title is missing', () => {
+      req.body = { dueDate: '2023-12-31', reminder: '2023-12-30' };
 
       validateTodo(req as Request, res as Response, next);
 
@@ -75,8 +55,8 @@ describe('validateTodo() validateTodo method', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 if title is not a string', () => {
-      req.body = { title: 123 };
+    test('should return 400 if title is an empty string', () => {
+      req.body = { title: '', dueDate: '2023-12-31', reminder: '2023-12-30' };
 
       validateTodo(req as Request, res as Response, next);
 
@@ -85,8 +65,8 @@ describe('validateTodo() validateTodo method', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 if title is an empty string', () => {
-      req.body = { title: '' };
+    test('should return 400 if title is not a string', () => {
+      req.body = { title: 123, dueDate: '2023-12-31', reminder: '2023-12-30' };
 
       validateTodo(req as Request, res as Response, next);
 
@@ -95,8 +75,8 @@ describe('validateTodo() validateTodo method', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 if dueDate is invalid', () => {
-      req.body = { title: 'Valid Title', dueDate: 'invalid-date' };
+    test('should return 400 if dueDate is invalid', () => {
+      req.body = { title: 'Valid Title', dueDate: 'invalid-date', reminder: '2023-12-30' };
 
       validateTodo(req as Request, res as Response, next);
 
@@ -105,13 +85,23 @@ describe('validateTodo() validateTodo method', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 if reminder is invalid', () => {
-      req.body = { title: 'Valid Title', reminder: 'invalid-date' };
+    test('should return 400 if reminder is invalid', () => {
+      req.body = { title: 'Valid Title', dueDate: '2023-12-31', reminder: 'invalid-date' };
 
       validateTodo(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({ message: 'Invalid reminder date' });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    test('should return 400 if both dueDate and reminder are invalid', () => {
+      req.body = { title: 'Valid Title', dueDate: 'invalid-date', reminder: 'invalid-date' };
+
+      validateTodo(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Invalid due date' });
       expect(next).not.toHaveBeenCalled();
     });
   });

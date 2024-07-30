@@ -2,14 +2,21 @@
 // Unit tests for: all
 
 
-import { SQLiteStatement } from './SQLiteDatabase';
+import { IStatement, SQLiteStatement } from '../SQLiteDatabase';
 
 
-jest.mock('better-sqlite3');
+jest.mock("better-sqlite3", () => {
+  return {
+    Database: jest.fn().mockImplementation(() => ({
+      prepare: jest.fn(),
+      exec: jest.fn(),
+    })),
+  };
+});
 
 describe('SQLiteStatement.all() all method', () => {
   let mockStatement: any;
-  let sqliteStatement: SQLiteStatement;
+  let sqliteStatement: IStatement;
 
   beforeEach(() => {
     mockStatement = {
@@ -22,7 +29,7 @@ describe('SQLiteStatement.all() all method', () => {
     test('should return an array of results when the statement executes successfully', () => {
       // Arrange
       const expectedResults = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }];
-      (mockStatement.all as unknown as jest.Mock).mockReturnValue(expectedResults);
+      mockStatement.all.mockReturnValue(expectedResults);
 
       // Act
       const results = sqliteStatement.all();
@@ -35,7 +42,7 @@ describe('SQLiteStatement.all() all method', () => {
     test('should return an empty array when there are no results', () => {
       // Arrange
       const expectedResults: any[] = [];
-      (mockStatement.all as unknown as jest.Mock).mockReturnValue(expectedResults);
+      mockStatement.all.mockReturnValue(expectedResults);
 
       // Act
       const results = sqliteStatement.all();
@@ -47,22 +54,36 @@ describe('SQLiteStatement.all() all method', () => {
   });
 
   describe('Edge Cases', () => {
-    test('should handle the case where the statement returns undefined', () => {
+    test('should handle the case when the statement returns a large number of results', () => {
       // Arrange
-      (mockStatement.all as unknown as jest.Mock).mockReturnValue(undefined);
+      const largeResults = Array.from({ length: 1000 }, (_, i) => ({ id: i, name: `Name${i}` }));
+      mockStatement.all.mockReturnValue(largeResults);
 
       // Act
       const results = sqliteStatement.all();
 
       // Assert
-      expect(results).toBeUndefined();
+      expect(results).toEqual(largeResults);
       expect(mockStatement.all).toHaveBeenCalledTimes(1);
     });
 
-    test('should handle the case where the statement throws an error', () => {
+    test('should handle the case when the statement returns results with various data types', () => {
+      // Arrange
+      const mixedResults = [{ id: 1, name: 'Alice', active: true }, { id: 2, name: 'Bob', active: false }];
+      mockStatement.all.mockReturnValue(mixedResults);
+
+      // Act
+      const results = sqliteStatement.all();
+
+      // Assert
+      expect(results).toEqual(mixedResults);
+      expect(mockStatement.all).toHaveBeenCalledTimes(1);
+    });
+
+    test('should handle the case when the statement throws an error', () => {
       // Arrange
       const errorMessage = 'Database error';
-      (mockStatement.all as unknown as jest.Mock).mockImplementation(() => {
+      mockStatement.all.mockImplementation(() => {
         throw new Error(errorMessage);
       });
 

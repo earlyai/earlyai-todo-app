@@ -5,19 +5,14 @@ import { Request, Response } from 'express';
 
 
 
-import { deleteTodo } from './todoController';
+import { deleteTodo } from '../todoController';
 
-// MockTodoService.ts
 
-// deleteTodo.test.ts
-
-// MockTodoService.ts
-
-export class MockTodoService {
+// Mock class for TodoService
+class MockTodoService {
   public deleteTodo = jest.fn();
 }
 
-// deleteTodo.test.ts
 describe('deleteTodo() deleteTodo method', () => {
   let mockTodoService: MockTodoService;
   let req: Request;
@@ -26,22 +21,19 @@ describe('deleteTodo() deleteTodo method', () => {
   beforeEach(() => {
     mockTodoService = new MockTodoService();
     req = {
-      params: {
-        id: '1',
-      },
+      params: { id: '1' }
     } as any;
-
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
       send: jest.fn(),
+      json: jest.fn()
     } as any;
   });
 
   describe('Happy Path', () => {
-    it('should delete a todo and return 204 status code', () => {
+    it('should return 204 status when todo is successfully deleted', () => {
       // Arrange
-      (mockTodoService.deleteTodo as unknown as jest.Mock).mockReturnValue(true);
+      mockTodoService.deleteTodo.mockReturnValue(true as any);
 
       // Act
       deleteTodo(mockTodoService as any)(req, res);
@@ -54,9 +46,9 @@ describe('deleteTodo() deleteTodo method', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should return 404 if the todo is not found', () => {
+    it('should return 404 status when todo is not found', () => {
       // Arrange
-      (mockTodoService.deleteTodo as unknown as jest.Mock).mockReturnValue(false);
+      mockTodoService.deleteTodo.mockReturnValue(false as any);
 
       // Act
       deleteTodo(mockTodoService as any)(req, res);
@@ -67,10 +59,10 @@ describe('deleteTodo() deleteTodo method', () => {
       expect(res.json).toHaveBeenCalledWith({ message: 'Todo not found' });
     });
 
-    it('should return 500 if there is an internal server error', () => {
+    it('should return 500 status when an exception is thrown', () => {
       // Arrange
-      (mockTodoService.deleteTodo as unknown as jest.Mock).mockImplementation(() => {
-        throw new Error('Internal Server Error');
+      mockTodoService.deleteTodo.mockImplementation(() => {
+        throw new Error('Test error');
       });
 
       // Act
@@ -78,6 +70,19 @@ describe('deleteTodo() deleteTodo method', () => {
 
       // Assert
       expect(mockTodoService.deleteTodo).toHaveBeenCalledWith('1');
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Internal Server Error' });
+    });
+
+    it('should handle missing id parameter gracefully', () => {
+      // Arrange
+      req.params.id = undefined as any;
+
+      // Act
+      deleteTodo(mockTodoService as any)(req, res);
+
+      // Assert
+      expect(mockTodoService.deleteTodo).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: 'Internal Server Error' });
     });

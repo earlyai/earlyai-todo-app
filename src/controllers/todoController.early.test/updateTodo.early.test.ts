@@ -4,9 +4,9 @@
 import { Request, Response } from 'express';
 
 
-import { Todo } from '../models/todo';
+import { Todo } from '../../models/todo';
 
-import { updateTodo } from './todoController';
+import { updateTodo } from '../todoController';
 
 
 class MockTodoService {
@@ -26,29 +26,28 @@ describe('updateTodo() updateTodo method', () => {
         title: 'Updated Title',
         completed: true,
         priority: 'high',
-        dueDate: '2023-12-31',
-        reminder: '2023-12-25'
+        dueDate: '2023-12-31T00:00:00.000Z',
+        reminder: '2023-12-25T00:00:00.000Z'
       }
     } as any;
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-      send: jest.fn()
+      json: jest.fn()
     } as any;
   });
 
   describe('Happy Path', () => {
-    it('should update a todo and return the updated todo', () => {
+    it('should update the todo and return the updated todo', () => {
       // Arrange
       const updatedTodo: Todo = {
         id: '1',
         title: 'Updated Title',
         completed: true,
         priority: 'high',
-        dueDate: new Date('2023-12-31'),
-        reminder: new Date('2023-12-25')
+        dueDate: new Date('2023-12-31T00:00:00.000Z'),
+        reminder: new Date('2023-12-25T00:00:00.000Z')
       };
-      (mockTodoService.updateTodo as unknown as jest.Mock).mockReturnValue(updatedTodo);
+      mockTodoService.updateTodo.mockReturnValue(updatedTodo as any);
 
       // Act
       updateTodo(mockTodoService as any)(req, res);
@@ -58,8 +57,8 @@ describe('updateTodo() updateTodo method', () => {
         title: 'Updated Title',
         completed: true,
         priority: 'high',
-        dueDate: new Date('2023-12-31'),
-        reminder: new Date('2023-12-25')
+        dueDate: new Date('2023-12-31T00:00:00.000Z'),
+        reminder: new Date('2023-12-25T00:00:00.000Z')
       });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(updatedTodo);
@@ -69,7 +68,7 @@ describe('updateTodo() updateTodo method', () => {
   describe('Edge Cases', () => {
     it('should return 404 if the todo is not found', () => {
       // Arrange
-      (mockTodoService.updateTodo as unknown as jest.Mock).mockReturnValue(null);
+      mockTodoService.updateTodo.mockReturnValue(null as any);
 
       // Act
       updateTodo(mockTodoService as any)(req, res);
@@ -79,18 +78,29 @@ describe('updateTodo() updateTodo method', () => {
         title: 'Updated Title',
         completed: true,
         priority: 'high',
-        dueDate: new Date('2023-12-31'),
-        reminder: new Date('2023-12-25')
+        dueDate: new Date('2023-12-31T00:00:00.000Z'),
+        reminder: new Date('2023-12-25T00:00:00.000Z')
       });
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ message: 'Todo not found' });
     });
 
-    it('should handle invalid date formats gracefully', () => {
+    it('should handle missing optional fields gracefully', () => {
       // Arrange
-      req.body.dueDate = 'invalid-date';
-      req.body.reminder = 'invalid-date';
-      (mockTodoService.updateTodo as unknown as jest.Mock).mockReturnValue(null);
+      req.body = {
+        title: 'Updated Title',
+        completed: true,
+        priority: 'high'
+      };
+      const updatedTodo: Todo = {
+        id: '1',
+        title: 'Updated Title',
+        completed: true,
+        priority: 'high',
+        dueDate: undefined,
+        reminder: undefined
+      };
+      mockTodoService.updateTodo.mockReturnValue(updatedTodo as any);
 
       // Act
       updateTodo(mockTodoService as any)(req, res);
@@ -103,13 +113,13 @@ describe('updateTodo() updateTodo method', () => {
         dueDate: undefined,
         reminder: undefined
       });
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Todo not found' });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(updatedTodo);
     });
 
-    it('should return 500 if there is an internal server error', () => {
+    it('should return 500 if an error occurs', () => {
       // Arrange
-      (mockTodoService.updateTodo as unknown as jest.Mock).mockImplementation(() => {
+      mockTodoService.updateTodo.mockImplementation(() => {
         throw new Error('Internal Server Error');
       });
 

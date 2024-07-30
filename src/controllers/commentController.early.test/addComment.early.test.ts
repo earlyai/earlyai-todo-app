@@ -4,14 +4,18 @@
 import { Request, Response } from 'express';
 
 
-import { addComment } from './commentController';
+import { addComment } from '../commentController';
 
+// addComment.test.ts
 
 // MockCommentService.ts
-export class MockCommentService {
+class MockCommentService {
   public addComment = jest.fn();
 }
 
+export { MockCommentService };
+
+// addComment.test.ts
 describe('addComment() addComment method', () => {
   let mockCommentService: MockCommentService;
   let req: Request;
@@ -21,11 +25,11 @@ describe('addComment() addComment method', () => {
     mockCommentService = new MockCommentService();
     req = {
       params: {},
-      body: {}
+      body: {},
     } as any;
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
     } as any;
   });
 
@@ -35,7 +39,7 @@ describe('addComment() addComment method', () => {
       req.params.todoId = '1';
       req.body.content = 'This is a comment';
       const newComment = { id: '1', todoId: '1', content: 'This is a comment' };
-      (mockCommentService.addComment as unknown as jest.Mock).mockResolvedValue(newComment as any as never);
+      mockCommentService.addComment.mockResolvedValue(newComment as any as never);
 
       // Act
       await addComment(mockCommentService as any)(req, res);
@@ -76,7 +80,7 @@ describe('addComment() addComment method', () => {
       // Arrange
       req.params.todoId = '1';
       req.body.content = 'This is a comment';
-      (mockCommentService.addComment as unknown as jest.Mock).mockRejectedValue(new Error('Service error') as never);
+      mockCommentService.addComment.mockRejectedValue(new Error('Service error') as never);
 
       // Act
       await addComment(mockCommentService as any)(req, res);
