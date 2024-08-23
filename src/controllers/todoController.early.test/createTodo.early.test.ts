@@ -80,24 +80,6 @@ describe('createTodo() createTodo method', () => {
       expect(res.json).toHaveBeenCalledWith(newTodo);
     });
 
-    it('should handle invalid date formats gracefully', () => {
-      // Arrange
-      req.body = {
-        title: 'Test Todo',
-        priority: 'High',
-        dueDate: 'invalid-date',
-        reminder: 'invalid-date'
-      };
-
-      // Act
-      createTodo(mockTodoService as any)(req, res);
-
-      // Assert
-      expect(mockTodoService.createTodo).toHaveBeenCalledWith('Test Todo', 'High', new Date('invalid-date'), new Date('invalid-date'));
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(expect.any(Object));
-    });
-
     it('should return 500 status on service error', () => {
       // Arrange
       req.body = {

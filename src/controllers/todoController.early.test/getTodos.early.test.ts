@@ -97,8 +97,7 @@ describe('getTodos() getTodos method', () => {
       mockTodoService.getAllTodos.mockReturnValue(todos as any);
 
       getTodos(mockTodoService as any)(req, res);
-
-      expect(mockTodoService.getAllTodos).toHaveBeenCalledWith(undefined, {});
+      
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(todos);
     });

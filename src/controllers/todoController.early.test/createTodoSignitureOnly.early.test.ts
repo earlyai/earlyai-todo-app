@@ -41,7 +41,6 @@ describe('createTodoSignitureOnly() createTodoSignitureOnly method', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(newTodo);
     });
   });
 

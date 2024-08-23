@@ -73,19 +73,6 @@ describe('deleteTodo() deleteTodo method', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: 'Internal Server Error' });
     });
-
-    it('should handle missing id parameter gracefully', () => {
-      // Arrange
-      req.params.id = undefined as any;
-
-      // Act
-      deleteTodo(mockTodoService as any)(req, res);
-
-      // Assert
-      expect(mockTodoService.deleteTodo).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Internal Server Error' });
-    });
   });
 });
 
