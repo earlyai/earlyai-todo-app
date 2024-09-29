@@ -1,0 +1,16 @@
+{
+    "runTestsOptions":{
+       "concurrency":3,
+       "delay":300,
+       "paths":[
+          {
+             "file":"src/**/*",
+             "names":[
+                "*"
+             ]
+          }
+         
+         ]
+    },
+    "createdBy":"Barak"
+  }
