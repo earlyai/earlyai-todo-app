@@ -1,0 +1,12 @@
+{
+  "showLastPrompt": false,
+  "backend": "qa",
+  "appendPrompt": false,
+  "conditionalKeep": false,
+  "greyTestBehaviour": "keep",
+  "redTestBehaviour": "keep",
+  "generateTestsModel": "gpt-4o-2024-11-20",
+  "authMode": "input",
+  "python": false,
+  "neverLogOut": true
+}
